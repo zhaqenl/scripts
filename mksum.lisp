@@ -17,7 +17,7 @@
                :description "Print this help.")
          (flag :short-name "l" :long-name "list"
                :description "List supported hash functions.")
-         (stropt :short-name "t" :long-name "type"
+         (stropt :short-name "t" :long-name "type" :argument-name "HASH"
                  :description "Specify hash function to use.")))
 
 (defun single-digest (type file)
@@ -85,9 +85,9 @@
                       (cons (mksum-dir (first-context) (first arg)) (option-with (rest arg))))))
              (option-without (arg)
                (cond ((null arg) nil)
-                     ((file-exists-p (first arg)) (cons (single-digest (for-sha) (first arg))
+                     ((file-exists-p (first arg)) (cons (single-digest (for-sha256) (first arg))
                                                         (option-without (rest arg))))
-                     ((directory-exists-p (first arg)) (cons (mksum-dir (for-sha) (first arg))
+                     ((directory-exists-p (first arg)) (cons (mksum-dir (for-sha256) (first arg))
                                                              (option-without (rest arg)))))))
       (cond ((get-opt "h") (help) (exit))
             ((get-opt "l") (print-list (ironclad:list-all-digests))
