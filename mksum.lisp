@@ -21,7 +21,11 @@
          (stropt :short-name "t" :long-name "type" :argument-name "HASH"
                  :description "Specify hash function to use")
          (flag :short-name "s" :long-name "string"
-               :description "Specify string to compute the checksum of")))
+               :description "Treat argument as a literal string.")))
+
+(defun format-two (arg-1 arg-2)
+  "Print the two arguments in aesthetic form."
+  (format nil "~A ~A" arg-1 arg-2))
 
 (defun checksum (type file)
   "Compute the TYPE checksum of FILE"
@@ -29,7 +33,7 @@
         (digest (make-array (ironclad:digest-length type) :element-type '(unsigned-byte 8)))
         (digester (ironclad:make-digest type)))
     (ironclad:digest-file digester file :buffer buffer :digest digest)
-    (format nil "~A ~A" (ironclad:byte-array-to-hex-string digest) (uiop:truenamize file))))
+    (format-two (ironclad:byte-array-to-hex-string digest) (uiop:truenamize file))))
 
 (defun hash (type string)
   "Compute the TYPE checksum of STRING"
@@ -62,7 +66,7 @@
     (let* ((path (slash-string directory))
            (value (reduce #'(lambda (string-1 string-2) (concat string-1 string-2))
                           (list-dir-checksum type path))))
-      (format nil "~A ~A" (hash type value) path))))
+      (format-two (hash type value) path))))
 
 (defun get-opt (option)
   "Get the value of OPTION from the context"
@@ -120,13 +124,13 @@
 (defun string-with (arg)
   "Create list, of the given type, of checksums of files and directories"
   (cond ((null arg) nil)
-        (t (cons (hash (first-context) (first arg))
+        (t (cons (format-two (hash (first-context) (first arg)) (first arg))
                  (string-with (rest arg))))))
 
 (defun string-without (arg)
   "Create list of SHA256 checksums of strings"
   (cond ((null arg) nil)
-        (t (cons (hash *default-hash* (first arg))
+        (t (cons (format-two (hash *default-hash* (first arg)) (first arg))
                  (string-without (rest arg))))))
 
 (defun print-help ()
