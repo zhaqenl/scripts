@@ -169,7 +169,7 @@
           ((or (get-opt "h") (null (remainder))) (print-help))
           ((and (get-opt "s") (get-opt "t")) (print-exit (string-with (remainder))))
           ((get-opt "s") (print-exit (string-without (remainder))))
-          ((get-opt "t") (print-exit (option-with (remainder))))          
+          ((get-opt "t") (print-exit (option-with (remainder))))
           (t (print-exit (option-without (remainder)))))))
 
 (register-commands :scripts/mksum)
