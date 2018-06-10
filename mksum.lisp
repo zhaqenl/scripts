@@ -1,20 +1,19 @@
 ;;;; mksum.lisp
 
-(uiop:define-package :scripts/mksum
+(uiop:define-package #:scripts/mksum
     (:use #:cl
           #:cl-scripting
           #:fare-utils
           #:net.didierverna.clon)
-  (:export #:mksum
-           #:file-checksum
-           #:directory-checksum))
+  (:export #:mksum))
 
 (in-package :scripts/mksum)
 
 (defvar *default-hash* :sha256 "Default hash function")
 
-(defsynopsis (:postfix "FILE...")
-  (text :contents "Prints the checksums of files and directories. Uses SHA256 by default")
+(defsynopsis (:postfix "(FILE...|STRING)")
+  (text :contents "Prints the checksums of files and directories. Uses SHA256 by default.
+")
   (group (:header "Options:")
          (flag :short-name "h" :long-name "help"
                :description "Print this help")
@@ -23,7 +22,7 @@
          (stropt :short-name "t" :long-name "type" :argument-name "HASH"
                  :description "Specify hash function to use")
          (flag :short-name "s" :long-name "string"
-               :description "Treat argument as a literal string.")))
+               :description "Treat argument as a literal string")))
 
 (defun format-two (arg-1 arg-2)
   "Print the two arguments in aesthetic form."

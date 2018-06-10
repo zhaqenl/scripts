@@ -1,7 +1,6 @@
-;;; unix.lisp
+;;;; unix.lisp
 
-(uiop:define-package
-    :scripts/unix
+(uiop:define-package #:scripts/unix
     (:use #:cl
           #:fare-utils
           #:uiop
@@ -14,23 +13,18 @@
           #:scripts/utils)
   (:export #:x
            #:v
-
            #:md
            #:rm!
            #:ln!
-
            #:g
            #:gi
-
            #:la
            #:lk
-
            #:l
            #:ll
            #:l!
            #:lh
            #:l1
-
            #:f
            #:lv))
 

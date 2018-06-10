@@ -1,7 +1,6 @@
 ;;;; apps.lisp
 
-(uiop:define-package
-    :scripts/apps
+(uiop:define-package #:scripts/apps
     (:use #:cl
           #:fare-utils
           #:uiop
@@ -16,61 +15,42 @@
            #:e
            #:term
            #:fire
+           #:chrome
+           #:tele
            #:keep
-           #:skype
-
            #:xrsync
            #:ra
            #:raz
-           #:raz!
-           #:chrome
-           #:tele
-           #:vibe
            #:qp
            #:rt
            #:rm@
            #:par
            #:v
-           #:xv
-
            #:bt
-           #:bt0
-           #:bt1
+           #:kt
 
            #:len
            #:leo
            #:tox
            #:vbox
+           #:raz!
+           #:lispworks-gui
+           #:lispworks-terminal
+           #:lw
+           #:lwt
 
+           #:bt-air
+           #:bt-pulse
            #:shell
            #:rshell
+
            #:screenshot
            #:sg2e
            #:smb))
 
 (in-package :scripts/apps)
 
-(defvar +screenshots-dir+ (home "hejmo/elsx/bil/ekrankopioj"))
-
-(exporting-definitions
-  (% s "sudo")
-  (% e "emacsclient -nw")
-  (% term "len urxvt")
-  (% fire "firefox")
-  (% chrome "google-chrome-unstable")
-  (% tele "telegram-desktop")
-  (% keep "keepassxc")
-  (% xrsync "rsync -rlptgoDHSx")
-  (% ra "xrsync")
-  (% raz "ra -z")
-  (% qp "qpdfview")
-  (% rt "rtorrent")
-  (% rm@ "shred -vfzun 10")
-  (% par "parallel --will-cite")
-  (% v "less")
-  (% xv "xzless")
-  (% bt "bluetoothctl")
-  (% kt "len krita"))
+(defvar +screenshots-dir+ (home ".screenshots/"))
 
 (defun run-locale (locale &rest args)
   "Run args with locale set to LOCALE"
@@ -90,6 +70,25 @@
   (run/i `(,binary ,@args)))
 
 (exporting-definitions
+  (% s "sudo")
+  (% e "emacsclient -nw")
+  (% term "len urxvt")
+  (% fire "firefox")
+  (% chrome "google-chrome-unstable")
+  (% tele "telegram-desktop")
+  (% keep "keepassxc")
+  (% xrsync "rsync -rlptgoDHSx")
+  (% ra "xrsync")
+  (% raz "ra -z")
+  (% qp "qpdfview")
+  (% rt "rtorrent")
+  (% rm@ "shred -vfzun 10")
+  (% par "parallel --will-cite")
+  (% v "less")
+  (% bt "bluetoothctl")
+  (% kt "len krita"))
+
+(exporting-definitions
   (defun len (&rest args) (run-locale "en_US.UTF-8" args))
   (defun leo (&rest args) (run-locale "eo.utf8" args))
   (defun tox (&rest args) (run-nix-user "qtox" "qtox" args))
@@ -97,16 +96,30 @@
 
   (defun raz! (&rest args)
     (apply-args-1 'raz args :options '("-e" "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"))
-    (success)))
+    (success))
+
+  (defun lispworks-gui (&rest args)
+    (run/i `(zsh "-c" "cr /usr/local/lib/LispWorks/lispworks-7-0-0-x86-linux" ,@args))
+    (success))
+
+  (defun lispworks-terminal (&rest args)
+    (run/i `(zsh "-c" "cr /home/pub/hejmo/apoj/lispworks/save-image/lispworks-terminal" ,@args))
+    (success))
+
+  (defun lw (&rest args)
+    (apply #'lispworks-gui args))
+
+  (defun lwt (&rest args)
+    (apply #'lispworks-terminal args)))
 
 (exporting-definitions
-  (defun bt0 ()
+  (defun bt-air ()
     (run/i `(pacmd "set-default-sink" "bluez_sink.B8_D5_0B_8D_77_EB.a2dp_sink"))
     (run/i `(pacmd "set-default-source" "bluez_sink.B8_D5_0B_8D_77_EB.a2dp_sink.monitor"))
     (run/i `(pacmd "set-port-latency-offset" "bluez_card.B8_D5_0B_8D_77_EB" "headphone-output" "250000"))
     (success))
 
-  (defun bt1 ()
+  (defun bt-pulse ()
     (run/i `(pacmd "set-default-sink" "bluez_sink.04_FE_A1_31_0B_7E.a2dp_sink"))
     (run/i `(pacmd "set-default-source" "bluez_sink.04_FE_A1_31_0B_7E.a2dp_sink.monitor"))
     (success))
@@ -123,7 +136,7 @@
     (let* ((dir +screenshots-dir+)
            (file (format nil "~A.png" (local-time:format-timestring nil (local-time:now))))
            (dest (format nil "mv $f ~A" dir))
-           (image (format nil "~A/~A" dir file)))
+           (image (format nil "~A~A" dir file)))
       (flet ((scrot (file dest &rest args)
                (run/i `(scrot ,@args ,file -e ,dest))))
         (match mode
