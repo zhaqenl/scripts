@@ -5,7 +5,9 @@
           #:cl-scripting
           #:fare-utils
           #:net.didierverna.clon)
-  (:export #:mksum))
+  (:export #:mksum
+           #:file-checksum
+           #:directory-checksum))
 
 (in-package :scripts/mksum)
 
@@ -27,8 +29,8 @@
   "Print the two arguments in aesthetic form."
   (format nil "~A ~A" arg-1 arg-2))
 
-(defun checksum (type file)
-  "Compute the TYPE checksum of FILE"
+(defun file-checksum (type file)
+  "Compute the TYPE checksum of FILE."
   (let ((buffer (make-array 8192 :element-type '(unsigned-byte 8)))
         (digest (make-array (ironclad:digest-length type) :element-type '(unsigned-byte 8)))
         (digester (ironclad:make-digest type)))
@@ -60,7 +62,7 @@
   "List the TYPE checksums of the files inside DIRECTORY"
   (mapcar #'first
           (mapcar #'(lambda (string) (cl-ppcre:split #\space string))
-                  (mapcar #'(lambda (file) (checksum type file))
+                  (mapcar #'(lambda (file) (file-checksum type file))
                           (collect-files directory)))))
 
 (defun concat (&rest args)
@@ -68,9 +70,9 @@
   (reduce #'(lambda (x y) (concatenate 'string x y)) args))
 
 (defun directory-checksum (type directory)
-  "Compute the TYPE checksum of the concatenated checksums of the files inside DIRECTORY"
+  "Compute the TYPE checksum of the concatenated checksums of the files inside DIRECTORY."
   (when (uiop:directory-exists-p directory)
-    (let* ((path (slash-string directory))
+    (let* ((path (uiop:truenamize (slash-string directory)))
            (value (reduce #'(lambda (string-1 string-2) (concat string-1 string-2))
                           (list-dir-checksum type path))))
       (format-two (hash type value) path))))
@@ -114,7 +116,7 @@
   "Create list, of the given type, of checksums of files and directories"
   (cond ((null arg) nil)
         ((file-context-p (first arg))
-         (cons (checksum (first-context) (first arg)) (option-with (rest arg))))
+         (cons (file-checksum (first-context) (first arg)) (option-with (rest arg))))
         ((directory-context-p (first arg))
          (cons (directory-checksum (first-context) (first arg)) (option-with (rest arg))))
         (t nil)))
@@ -123,7 +125,7 @@
   "Create list of SHA256 checksums of files and directories"
   (cond ((null arg) nil)
         ((file-really-exists-p (first arg))
-         (cons (checksum *default-hash* (first arg)) (option-without (rest arg))))
+         (cons (file-checksum *default-hash* (first arg)) (option-without (rest arg))))
         ((uiop:directory-exists-p (first arg)) (cons (directory-checksum *default-hash*
                                                                          (first arg))
                                                      (option-without (rest arg))))
@@ -150,21 +152,23 @@
   "Print list of supported digests"
   (print-list (ironclad:list-all-digests)))
 
+(defun print-preserve (ffunction)
+  "Invoke FFUNCTION on (read)."
+  (setf (readtable-case *readtable*) :preserve)
+  (print-list (apply ffunction (list (list (symbol-name (read))))))
+  (exit))
+
 (exporting-definitions
   (defun mksum (&rest args)
-    "Compute the checksum of the given file(s) and directory(ies)"
+    "Compute the checksum of the given file(s) and directory(ies)."
     (declare (ignorable args))
-    (cond ((or (get-opt "h") (null (remainder)))
-           (print-help))
-          ((get-opt "l")
-           (print-exit (ironclad:list-all-digests)))
-          ((and (get-opt "s")
-                (get-opt "t"))
-           (print-exit (string-with (remainder))))
-          ((get-opt "s")
-           (print-exit (string-without (remainder))))
-          ((get-opt "t")
-           (print-exit (option-with (remainder))))
+    (cond ((and (get-opt "s") (null (remainder)) (get-opt "t")) (print-preserve #'string-with))
+          ((and (get-opt "s") (null (remainder))) (print-preserve #'string-without))
+          ((get-opt "l") (print-exit (ironclad:list-all-digests)))
+          ((or (get-opt "h") (null (remainder))) (print-help))
+          ((and (get-opt "s") (get-opt "t")) (print-exit (string-with (remainder))))
+          ((get-opt "s") (print-exit (string-without (remainder))))
+          ((get-opt "t") (print-exit (option-with (remainder))))          
           (t (print-exit (option-without (remainder)))))))
 
 (register-commands :scripts/mksum)
