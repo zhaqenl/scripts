@@ -1,10 +1,16 @@
 #-asdf3.1 (error "ASDF 3.1 or bust!")
 
-(defsystem "scripts"
-  :version "0.0.1"
+(defpackage :scripts-system
+  (:use #:cl #:asdf))
+
+(in-package #:scripts-system)
+
+(defsystem :scripts
+  :name "scripts"
+  :version "0.0.10"
   :description "Common Lisp scripts"
-  :license "MIT"
-  :author "Rommel Martinez"
+  :license "CC0"
+  :author "Rommel Martinez <ebzzry@ebzzry.io>"
   :class :package-inferred-system
   :depends-on ((:version "cl-scripting" "0.1")
                (:version "inferior-shell" "2.0.3.3")
@@ -13,10 +19,12 @@
                #:ironclad
                #:net.didierverna.clon
                #:mof
+               #:split-sequence
                "scripts/misc"
                "scripts/touchpad"
                "scripts/general"
                "scripts/apps"
                "scripts/unix"
                "scripts/mksum"
-               "scripts/mksum-v"))
+               "scripts/tablet"
+               "scripts/webcam"))
