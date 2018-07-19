@@ -26,9 +26,10 @@
            #:lh
            #:l1
            #:f
-           #:lv))
+           #:lv
+           #:sush))
 
-(in-package :scripts/unix)
+(in-package #:scripts/unix)
 
 (exporting-definitions
  (% x "zsh -c")
@@ -52,11 +53,15 @@
 
 (exporting-definitions
  (defun f (arg)
-   (run/i `(find "." -iname ,(format nil "*~A*" arg)))
+   (run/i `(find "." -iname ,(mof:fmt "*~A*" arg)))
    (success))
 
  (defun lv (&rest args)
    (run/i `(pipe (l ,@args) (less)))
+   (success))
+
+ (defun sush (&rest args)
+   (run/i `(sudo "sh" "-c" ,(mof:fmt "~{~A~^ ~}" args)))
    (success)))
 
 (register-commands :scripts/unix)

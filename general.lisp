@@ -11,18 +11,19 @@
           #:cl-ppcre
           #:cl-launch/dispatch
           #:scripts/misc
-          #:scripts/utils)
+          #:scripts/utils
+          #:scripts/tablet)
   (:export #:ascii-hex-table
            #:ascii-oct-table
            #:rot13
            #:battery
            #:trackpoint
            #:xxx
-           #:psg
-           #:psk
-           #:psk!))
+           #:pg
+           #:pk
+           #:pk!))
 
-(in-package :scripts/general)
+(in-package #:scripts/general)
 
 (defvar *num-mode* "[31m")
 (defvar *colon-mode* "[34m")
@@ -30,13 +31,14 @@
 (defvar *normal-mode* "[0m")
 
 (defun xdev-id (name type)
-  (format nil "~A"
-          (regex-replace
-           (create-scanner ".*id=(.*?)	+.*")
-           (first (remove-if (complement
-                              #'(lambda (line)
-                                  (and (search name line) (search (format nil "slave  ~A" type) line))))
-                             (run-program '("xinput" "list") :output :lines))) "\\1")))
+  (mof:fmt
+   "~A"
+   (regex-replace
+    (create-scanner ".*id=(.*?)	+.*")
+    (first (remove-if (complement
+                       #'(lambda (line)
+                           (and (search name line) (search (mof:fmt "slave  ~A" type) line))))
+                      (run-program '("xinput" "list") :output :lines))) "\\1")))
 
 (defun xdev (name type command &rest args)
   (let ((id (xdev-id name type)))
@@ -45,9 +47,9 @@
       (success))))
 
 (defun xmap (keymap)
-  (run/i `(setxkbmap dvorak))
-  (run/i `(xset r rate 250))
-  (run/i `(xmodmap ,(home (format nil "hejmo/ktp/xmodmap/.Xmodmap.~A" keymap))))
+  (run/i `("setxkbmap" "dvorak"))
+  (run/i `("xset" "r" "rate" "250"))
+  (run/i `("xmodmap" ,(mof:home (mof:fmt "hejmo/ktp/xmodmap/.Xmodmap.~A" keymap))))
   (success))
 
 (defun load-xmodmap (device)
@@ -59,9 +61,40 @@
           (xmap "ceteraj.dvorak")))
   (success))
 
-(defun load-xresources ()
-  (run `(xrdb ,(home ".Xresources")) :output :interactive :input :interactive :error-output nil :on-error nil)
+(defun load-keymap ()
+  (load-xmodmap "Kinesis Advantage PRO MPC/USB Keyboard"))
+
+(defun load-xset ()
+  (run/i `("xset" "s" "1800" "1800")))
+
+(defun load-tablet ()
+  (run/i `(intuos-bind))
+  (dolist (cmd `(("2" "key +ctrl x -ctrl")
+                 ("3" "key +ctrl c -ctrl")
+                 ("8" "key +ctrl v -ctrl")
+                 ("9" "key +ctrl a -ctrl")
+                 ("10" "key +ctrl y -ctrl")
+                 ("11" "key +ctrl z -ctrl")))
+    (run/i (append (list "intuos-map" "Button") cmd))))
+
+(defun load-resources ()
+  (run `(xrdb ,(mof:home ".Xresources")) :output :interactive :input :interactive :error-output nil :on-error nil)
   (success))
+
+(defun load-hostname ()
+  (let ((hostname (hostname))
+        (xdev-args '("pointer" "set-button-map" "1" "2" "3" "5" "4")))
+    (match hostname
+      ((ppcre "vulpo")
+       (scripts/touchpad:disable)
+       (trackpoint "TPPS/2 IBM TrackPoint")
+       (apply #'xdev (append '("Logitech USB Receiver") xdev-args)))
+      ((ppcre "pando")
+       (apply #'xdev (append '("Xornet gaming mouse") xdev-args)))
+      (_ (success)))))
+
+(defun pgrep-lines (&rest args)
+  (run/lines `(pgrep "--list-full" "--list-name" "--full" "--ignore-case" ,@args)))
 
 (exporting-definitions
   (defun ascii-hex-table ()
@@ -94,36 +127,30 @@
 
   (defun trackpoint (arg)
     (let ((device arg))
-      (run/i `(xinput set-prop ,device "Evdev Wheel Emulation" 1))
-      (run/i `(xinput set-prop ,device "Evdev Wheel Emulation Button" 2))
-      (run/i `(xinput set-prop ,device "Evdev Wheel Emulation Timeout" 200))
-      (run/i `(xinput set-prop ,device "Evdev Wheel Emulation Axes" 7 6 5 4))
+      (run/i `("xinput" "set-prop" ,device "Evdev Wheel Emulation" 1))
+      (run/i `("xinput" "set-prop" ,device "Evdev Wheel Emulation Button" 2))
+      (run/i `("xinput" "set-prop" ,device "Evdev Wheel Emulation Timeout" 200))
+      (run/i `("xinput" "set-prop" ,device "Evdev Wheel Emulation Axes" 7 6 5 4))
       (success)))
 
   (defun xxx ()
-    (let ((hostname (hostname))
-          (xdev-args '("pointer" "set-button-map" "1" "2" "3" "5" "4")))
-      (load-xmodmap "Kinesis Advantage PRO MPC/USB Keyboard")
-      (load-xresources)
-      (match hostname
-        ((ppcre "vulpo")
-         (scripts/touchpad:disable)
-         (trackpoint "TPPS/2 IBM TrackPoint")
-         (apply #'xdev (append '("Logitech USB Receiver") xdev-args)))
-        ((ppcre "pando")
-         (apply #'xdev (append '("Xornet gaming mouse") xdev-args)))
-        (_ (success)))))
+    (load-keymap)
+    (load-xset)
+    (load-resources)
+    (load-tablet)
+    (load-hostname)
+    (success))
 
-  (defun psg (&rest args)
+  (defun pg (&rest args)
     (run/i `(pgrep "--list-full" "--list-name" "--full" "--ignore-case" ,@args))
     (success))
 
-  (defun psk (&rest args)
-    (let ((numbers (mapcar #'string-first (psg-lines (last args)))))
+  (defun pk (&rest args)
+    (let ((numbers (mapcar #'string-first (pgrep-lines (last args)))))
       (loop :for number :in numbers :do (run/i `(kill ,@(butlast args) ,number))))
     (success))
 
-  (defun psk! (&rest args)
-    (apply-args-1 'psk args :options '("-9"))))
+  (defun pk! (&rest args)
+    (apply-args-1 'pk args :options '("-9"))))
 
 (register-commands :scripts/general)

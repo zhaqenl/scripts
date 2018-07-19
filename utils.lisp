@@ -11,16 +11,14 @@
   (:export #:char-display-char
            #:battery-status
            #:wine
-           #:home
            #:err
            #:apply-args
            #:apply-args-1
            #:string-first
-           #:psg-lines
            #:find-binary
            #:%))
 
-(in-package :scripts/utils)
+(in-package #:scripts/utils)
 
 (defun char-display-char (c)
   (if (or (member c '(127 155))
@@ -45,9 +43,6 @@
 (defun wine (path &rest args)
   (run/i `(wine ,path ,@args)))
 
-(defun home (path)
-  (subpathname (user-homedir-pathname) path))
-
 (defun err (message)
   (die 1 (format t "Error: ~A~%" message)))
 
@@ -60,9 +55,6 @@
 (defun string-first (string)
   (let* ((space (position #\  string :test #'equal)))
     (subseq string 0 space)))
-
-(defun psg-lines (&rest args)
-  (run/lines `(pgrep "--list-full" "--list-name" "--full" "--ignore-case" ,@args)))
 
 (defun find-binary (binary)
   (run/ss `(readlink -f ,(run/ss `(which ,binary)))))

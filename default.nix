@@ -14,6 +14,8 @@ stdenv.mkDerivation {
     clisp
     mkcl
     ncurses
+    libfixposix
+    jdk10
   ];
 
   LD_LIBRARY_PATH = stdenv.lib.makeLibraryPath [
@@ -28,11 +30,13 @@ stdenv.mkDerivation {
     mesa
     cairo
     glib
-    gdk_pixbuf
     gnome2.pango
     gnome3.gtk
     gnome3.libsoup
     gnome3.webkitgtk
+
+    alsaLib
+    libpulseaudio
   ];
 
   shellHook = ''
