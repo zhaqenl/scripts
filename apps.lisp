@@ -20,6 +20,7 @@
            #:a0
            #:qb
            #:qt5ct
+           #:td
 
            #:vbox
 
@@ -65,7 +66,8 @@
 
 (exporting-definitions
  ($ "qt5ct" qt5ct)
- ($ "qbittorrent" qbittorrent qb))
+ ($ "qbittorrent" qbittorrent qb)
+ ($ "telegram-desktop" telegram-desktop td))
 
 (exporting-definitions
  (defun vbox () (run-with-nix-system "VirtualBox"))
