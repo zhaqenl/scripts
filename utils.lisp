@@ -16,6 +16,9 @@
            #:apply-args-1
            #:string-first
            #:find-binary
+           #:with-qt
+           #:run-with-nix-user
+           #:$
            #:%))
 
 (in-package #:scripts/utils)
@@ -63,3 +66,24 @@
   `(defun ,name (&rest args)
      (run/i (append (split "\\s+" ,command) args))
      (success)))
+
+(defun run-with-nix-user (profile binary args)
+  "Run binary under a separate profile."
+  (let ((bin (mof:home (mof:fmt ".baf/profiles/~A/bin" profile))))
+    (setf (getenv "PATH") (unix-namestring bin))
+    (run/i `(,binary ,@args))
+(success)))
+
+(defun with-qt (command args)
+  "Run a program in the QT profile."
+  (setf (getenv "QT_QPA_PLATFORMTHEME") "qt5ct")
+  (run-with-nix-user "qt" command args))
+
+(defmacro $ (command name &optional alias)
+  "Define a runner in the QT profile."
+  `(progn
+     (defun ,name (&rest args)
+       (with-qt ,command args))
+     ,(when alias
+        `(defun ,alias (&rest args)
+(with-qt ,command args)))))
