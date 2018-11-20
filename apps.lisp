@@ -19,6 +19,7 @@
            #:oa
            #:a0
            #:qb
+           #:qt5ct
 
            #:vbox
 
@@ -63,6 +64,7 @@
  (% a0 "xmodmap /home/zhaqenl/.Xmodmap"))
 
 (exporting-definitions
+ ($ "qt5ct" qt5ct)
  ($ "qbittorrent" qbittorrent qb))
 
 (exporting-definitions
