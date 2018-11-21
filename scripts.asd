@@ -22,7 +22,6 @@
                #:split-sequence
                "scripts/dummy"
                "scripts/misc"
-               "scripts/general"
                "scripts/apps"
                "scripts/unix"
                "scripts/mksum"))

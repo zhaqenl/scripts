@@ -11,57 +11,13 @@
           #:cl-launch/dispatch
           #:scripts/misc
           #:scripts/utils)
-  (:export #:x
-           #:v
-           #:md
-           #:rm!
-           #:ln!
-           #:g
-           #:gi
-           #:la
-           #:lk
-           #:l
-           #:ll
-           #:l!
-           #:lh
-           #:l1
-           #:f
-           #:lv
-           #:sush))
+  (:export #:l
+           #:ll))
 
 (in-package #:scripts/unix)
 
 (exporting-definitions
- (% x "zsh -c")
- (% v "less")
-
- (% md "mkdir -p")
- (% rm! "rm -rf")
- (% ln! "ln -sf")
-
- (% g "egrep --color")
- (% gi "g -i")
-
- (% la "ls -A -F --color ")
- (% lk "la -l")
-
  (% l  "la -tr")
- (% ll "l -l")
- (% l! "l -R")
- (% lh "l -H")
- (% l1 "l -1"))
-
-(exporting-definitions
- (defun f (arg)
-   (run/i `(find "." -iname ,(mof:fmt "*~A*" arg)))
-   (success))
-
- (defun lv (&rest args)
-   (run/i `(pipe (l ,@args) (less)))
-   (success))
-
- (defun sush (&rest args)
-   (run/i `(sudo "sh" "-c" ,(mof:fmt "~{~A~^ ~}" args)))
-   (success)))
+ (% ll "l -l"))
 
 (register-commands :scripts/unix)
