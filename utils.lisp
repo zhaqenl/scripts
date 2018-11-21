@@ -76,7 +76,7 @@
      (success)))
 
 (defun run-with-qt (command args)
-  "Run a program in the QT profile."
+  "Run a program with QT_QPA_PLATFORMTHEME=qt5ct."
   (let ((bin (mof:home ".nix-profile/bin")))
     (setf (getenv "QT_QPA_PLATFORMTHEME") "qt5ct")
     (setf (getenv "PATH") (unix-namestring bin))
@@ -84,7 +84,7 @@
     (success)))
 
 (defmacro $ (command name &optional alias)
-  "Define a runner in the QT profile."
+  "Define a runner with QT_QPA_PLATFORMTHEME=qt5ct."
   `(progn
      (defun ,name (&rest args)
        (run-with-qt ,command args))
