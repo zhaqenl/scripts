@@ -17,6 +17,7 @@
            #:oa-x
            #:oa
            #:a0
+           #:gp
 
            #:qt
            #:qb
@@ -32,7 +33,8 @@
  (% e "emacsclient -nw")
  (% oa-x "xhost local:root")
  (% oa "docker run --rm -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix ebzzry/opera /usr/bin/opera --no-sandbox")
- (% a0 "xmodmap /home/zhaqenl/.Xmodmap"))
+ (% a0 "xmodmap /home/zhaqenl/.Xmodmap")
+ (% gp "gnome-pomodoro"))
 
 (exporting-definitions
  ($ "qt5ct" qt5ct qt)
