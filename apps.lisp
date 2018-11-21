@@ -19,6 +19,7 @@
            #:a0
 
            #:qt
+           #:qb
            
            #:vbox))
 
@@ -34,7 +35,8 @@
  (% a0 "xmodmap /home/zhaqenl/.Xmodmap"))
 
 (exporting-definitions
- ($ "qt5ct" qt5ct qt))
+ ($ "qt5ct" qt5ct qt)
+ ($ "qbittorrent" qbittorrent qb))
 
 (exporting-definitions
  (defun vbox () (run-with-nix-system "VirtualBox")))
