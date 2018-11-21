@@ -17,12 +17,8 @@
            #:oa-x
            #:oa
            #:a0
-           #:qb
-           #:qt5ct
-           #:td
-
-           #:vbox
-           #:cb))
+           
+           #:vbox))
 
 (in-package #:scripts/apps)
 
@@ -59,12 +55,6 @@
  (% a0 "xmodmap /home/zhaqenl/.Xmodmap"))
 
 (exporting-definitions
- ($ "qt5ct" qt5ct)
- ($ "qbittorrent" qbittorrent qb)
- ($ "telegram-desktop" telegram-desktop td))
-
-(exporting-definitions
- (defun vbox () (run-with-nix-system "VirtualBox"))
- (defun cb (&rest args) (run-with-nix-user "calibre" "calibre" args)))
+ (defun vbox () (run-with-nix-system "VirtualBox")))
 
 (register-commands :scripts/apps)
