@@ -11,14 +11,10 @@
           #:cl-ppcre
           #:cl-launch/dispatch
           #:scripts/misc
-          #:scripts/utils
-          #:scripts/tablet)
+          #:scripts/utils)
   (:export #:ascii-hex-table
            #:ascii-oct-table
            #:rot13
-           #:battery
-           #:trackpoint
-           #:xxx
            #:pg
            #:pk
            #:pk!))
@@ -67,31 +63,9 @@
 (defun load-xset ()
   (run/i `("xset" "s" "1800" "1800")))
 
-(defun load-tablet ()
-  (run/i `(intuos-bind))
-  (dolist (cmd `(("2" "key +ctrl x -ctrl")
-                 ("3" "key +ctrl c -ctrl")
-                 ("8" "key +ctrl v -ctrl")
-                 ("9" "key +ctrl a -ctrl")
-                 ("10" "key +ctrl y -ctrl")
-                 ("11" "key +ctrl z -ctrl")))
-    (run/i (append (list "intuos-map" "Button") cmd))))
-
 (defun load-resources ()
   (run `(xrdb ,(mof:home ".Xresources")) :output :interactive :input :interactive :error-output nil :on-error nil)
   (success))
-
-(defun load-hostname ()
-  (let ((hostname (hostname))
-        (xdev-args '("pointer" "set-button-map" "1" "2" "3" "5" "4")))
-    (match hostname
-      ((ppcre "vulpo")
-       (scripts/touchpad:disable)
-       (trackpoint "TPPS/2 IBM TrackPoint")
-       (apply #'xdev (append '("Logitech USB Receiver") xdev-args)))
-      ((ppcre "pando")
-       (apply #'xdev (append '("Xornet gaming mouse") xdev-args)))
-      (_ (success)))))
 
 (defun pgrep-lines (&rest args)
   (run/lines `(pgrep "--list-full" "--list-name" "--full" "--ignore-case" ,@args)))
@@ -119,26 +93,6 @@
 
   (defun rot13 (&rest args)
     (run/i `(tr "[a-zA-Z]" "[n-za-mN-ZA-M]" ,@args))
-    (success))
-
-  (defun battery ()
-    (format t "~A" (battery-status))
-    (values))
-
-  (defun trackpoint (arg)
-    (let ((device arg))
-      (run/i `("xinput" "set-prop" ,device "Evdev Wheel Emulation" 1))
-      (run/i `("xinput" "set-prop" ,device "Evdev Wheel Emulation Button" 2))
-      (run/i `("xinput" "set-prop" ,device "Evdev Wheel Emulation Timeout" 200))
-      (run/i `("xinput" "set-prop" ,device "Evdev Wheel Emulation Axes" 7 6 5 4))
-      (success)))
-
-  (defun xxx ()
-    (load-keymap)
-    (load-xset)
-    (load-resources)
-    (load-tablet)
-    (load-hostname)
     (success))
 
   (defun pg (&rest args)

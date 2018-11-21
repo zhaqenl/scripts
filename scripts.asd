@@ -21,10 +21,7 @@
                #:mof
                #:split-sequence
                "scripts/misc"
-               "scripts/touchpad"
                "scripts/general"
                "scripts/apps"
                "scripts/unix"
-               "scripts/mksum"
-               "scripts/tablet"
-               "scripts/webcam"))
+               "scripts/mksum"))
