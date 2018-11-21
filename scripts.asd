@@ -20,6 +20,7 @@
                #:net.didierverna.clon
                #:mof
                #:split-sequence
+               "scripts/dummy"
                "scripts/misc"
                "scripts/general"
                "scripts/apps"

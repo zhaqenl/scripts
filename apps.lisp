@@ -23,6 +23,7 @@
            #:td
 
            #:vbox
+           #:cb
 
            #:shell
            #:rshell
