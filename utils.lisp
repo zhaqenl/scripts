@@ -16,10 +16,14 @@
            #:apply-args-1
            #:string-first
            #:find-binary
-           #:with-qt
-           #:run-with-nix-user
+           
            #:$
-           #:%))
+           #:%
+
+           #:run-with-locale
+           #:run-with-nix-system         
+           #:run-with-xdg
+           #:run-with-qt))
 
 (in-package #:scripts/utils)
 
@@ -49,28 +53,41 @@
 (defun find-binary (binary)
   (run/ss `(readlink -f ,(run/ss `(which ,binary)))))
 
+(defun run-with-locale (locale &rest args)
+  "Run args with locale set to LOCALE"
+  (setf (getenv "LANG") locale)
+  (run/i `(,@(first args)))
+  (success))
+
+(defun run-with-nix-system (binary &rest args)
+  "Run binary without user paths"
+  (setf (getenv "PATH") "/var/setuid-wrappers:/run/wrappers/bin:/run/current-system/sw/bin:/run/current-system/sw/sbin:/nix/var/nix/profiles/default/bin:/nix/var/nix/profiles/default/sbin")
+  (run/i `(,binary ,@args)))
+
+(defun run-with-xdg (binary &rest args)
+  "Run binary under a custom XDG_DATA_DIRS path"
+  (setf (getenv "XDG_DATA_DIRS")
+        (uiop:native-namestring (mof:home ".local/share/mime")))
+  (run/i `(,binary ,@args)))
+
 (defmacro % (name command)
   `(defun ,name (&rest args)
      (run/i (append (split "\\s+" ,command) args))
      (success)))
 
-(defun run-with-nix-user (profile binary args)
-  "Run binary under a separate profile."
-  (let ((bin (mof:home (mof:fmt ".baf/profiles/~A/bin" profile))))
-    (setf (getenv "PATH") (unix-namestring bin))
-    (run/i `(,binary ,@args))
-    (success)))
-
-(defun with-qt (command args)
+(defun run-with-qt (command args)
   "Run a program in the QT profile."
-  (setf (getenv "QT_QPA_PLATFORMTHEME") "qt5ct")
-  (run-with-nix-user "qt" command args))
+  (let ((bin (mof:home ".nix-profile/bin")))
+    (setf (getenv "QT_QPA_PLATFORMTHEME") "qt5ct")
+    (setf (getenv "PATH") (unix-namestring bin))
+    (run/i `(,command ,@args))
+    (success)))
 
 (defmacro $ (command name &optional alias)
   "Define a runner in the QT profile."
   `(progn
      (defun ,name (&rest args)
-       (with-qt ,command args))
+       (run-with-qt ,command args))
      ,(when alias
         `(defun ,alias (&rest args)
-           (with-qt ,command args)))))
+           (run-with-qt ,command args)))))
