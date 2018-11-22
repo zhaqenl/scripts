@@ -21,6 +21,7 @@
 
            #:qt
            #:qb
+           #:cb
            
            #:vbox))
 
@@ -38,7 +39,8 @@
 
 (exporting-definitions
  ($ "qt5ct" qt5ct qt)
- ($ "qbittorrent" qbittorrent qb))
+ ($ "qbittorrent" qbittorrent qb)
+ ($ "calibre" calibre cb))
 
 (exporting-definitions
  (defun vbox () (run-with-nix-system "VirtualBox")))
