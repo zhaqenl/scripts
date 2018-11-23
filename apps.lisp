@@ -19,9 +19,6 @@
            #:a0
 
            #:calibre
-           #:ebook-viewer
-           #:ebook-edit
-           #:qt5ct
            #:qbittorrent
            
            #:vbox))
@@ -39,9 +36,6 @@
 
 (exporting-definitions
  ($ "calibre" calibre)
- ($ "ebook-viewer" ebook-viewer)
- ($ "ebook-edit" ebook-edit)
- ($ "qt5ct" qt5ct)
  ($ "qbittorrent" qbittorrent))
 
 (exporting-definitions
