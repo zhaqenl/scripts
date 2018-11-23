@@ -20,6 +20,7 @@
 
            #:calibre
            #:ebook-viewer
+           #:ebook-edit
            #:qt5ct
            #:qbittorrent
            
@@ -39,6 +40,7 @@
 (exporting-definitions
  ($ "calibre" calibre)
  ($ "ebook-viewer" ebook-viewer)
+ ($ "ebook-edit" ebook-edit)
  ($ "qt5ct" qt5ct)
  ($ "qbittorrent" qbittorrent))
 
