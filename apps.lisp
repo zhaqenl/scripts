@@ -17,7 +17,6 @@
            #:oa-x
            #:oa
            #:a0
-           #:gp
 
            #:calibre
            #:ebook-viewer
