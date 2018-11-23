@@ -19,9 +19,11 @@
            #:a0
            #:gp
 
-           #:qt
-           #:qb
-           #:cb
+           #:calibre
+           #:ebook-viewer
+           #:ebook-edit
+           #:qt5ct
+           #:qbittorrent
            
            #:vbox))
 
@@ -38,9 +40,11 @@
  (% gp "gnome-pomodoro"))
 
 (exporting-definitions
- ($ "qt5ct" qt5ct qt)
- ($ "qbittorrent" qbittorrent qb)
- ($ "calibre" calibre cb))
+ ($ "calibre" calibre)
+ ($ "ebook-viewer" ebook-viewer)
+ ($ "ebook-edit" ebook-edit)
+ ($ "qt5ct" qt5ct)
+ ($ "qbittorrent" qbittorrent))
 
 (exporting-definitions
  (defun vbox () (run-with-nix-system "VirtualBox")))
