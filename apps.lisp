@@ -17,9 +17,6 @@
            #:oa-x
            #:oa
            #:a0
-
-           #:calibre
-           #:qbittorrent
            
            #:vbox))
 
@@ -33,10 +30,6 @@
  (% oa-x "xhost local:root")
  (% oa "docker run --rm -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix ebzzry/opera /usr/bin/opera --no-sandbox")
  (% a0 "xmodmap /home/zhaqenl/.Xmodmap"))
-
-(exporting-definitions
- ($ "calibre" calibre)
- ($ "qbittorrent" qbittorrent))
 
 (exporting-definitions
  (defun vbox () (run-with-nix-system "VirtualBox")))
