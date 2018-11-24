@@ -16,7 +16,6 @@
            #:e
            #:oa-x
            #:oa
-           #:a0
            
            #:vbox))
 
@@ -28,8 +27,7 @@
  (% s "sudo")
  (% e "emacsclient -nw")
  (% oa-x "xhost local:root")
- (% oa "docker run --rm -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix ebzzry/opera /usr/bin/opera --no-sandbox")
- (% a0 "xmodmap /home/zhaqenl/.Xmodmap"))
+ (% oa "docker run --rm -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix ebzzry/opera /usr/bin/opera --no-sandbox"))
 
 (exporting-definitions
  (defun vbox () (run-with-nix-system "VirtualBox")))
